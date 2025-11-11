@@ -18,23 +18,23 @@ export const getAllPosts = query({
         const author = await ctx.db.get(post.authorId);
 
         // Enrich comments with user information
-        // const enrichedComments = await Promise.all(
-        //   post.comments.map(async (comment) => {
-        //     const user = await ctx.db.get(comment.userId);
-        //     return {
-        //       ...comment,
-        //       userName: user?.name || 'Unknown',
-        //       userImageUrl: user?.imageUrl || null,
-        //     };
-        //   })
-        // );
+        const enrichedComments = await Promise.all(
+          post.comments.map(async (comment) => {
+            const user = await ctx.db.get(comment.userId);
+            return {
+              ...comment,
+              userName: user?.name || "Unknown",
+              userImageUrl: user?.imageUrl || null,
+            };
+          })
+        );
 
         return {
           ...post,
           authorName: author?.name || "Unknown",
           authorUsername: author?.username || "unknown",
           authorImageUrl: author?.imageUrl || null,
-          //   comments: enrichedComments,
+          comments: enrichedComments,
         };
       })
     );
@@ -78,23 +78,23 @@ export const getPostById = query({
     const author = await ctx.db.get(post.authorId);
 
     // Enrich comments with user information
-    // const enrichedComments = await Promise.all(
-    //   post.comments.map(async (comment) => {
-    //     const user = await ctx.db.get(comment.userId);
-    //     return {
-    //       ...comment,
-    //       userName: user?.name || 'Unknown',
-    //       userImageUrl: user?.imageUrl || null,
-    //     };
-    //   })
-    // );
+    const enrichedComments = await Promise.all(
+      post.comments.map(async (comment) => {
+        const user = await ctx.db.get(comment.userId);
+        return {
+          ...comment,
+          userName: user?.name || "Unknown",
+          userImageUrl: user?.imageUrl || null,
+        };
+      })
+    );
 
     return {
       ...post,
       authorName: author?.name || "Unknown",
       authorUsername: author?.username || "unknown",
       authorImageUrl: author?.imageUrl || null,
-      //   comments: enrichedComments,
+      comments: enrichedComments,
     };
   },
 });
@@ -130,9 +130,8 @@ export const createPost = mutation({
       authorId: user._id,
       content: args.content.trim(),
       imageUrl: args.imageUrl,
-      tags: args.tags || [],
       likes: [],
-      //   comments: [],
+      comments: [],
       createdAt: now,
       updatedAt: now,
     });
@@ -191,50 +190,50 @@ export const likePost = mutation({
 /**
  * Add a comment to a post
  */
-// export const addComment = mutation({
-//   args: {
-//     postId: v.id('posts'),
-//     content: v.string(),
-//   },
-//   handler: async (ctx, args) => {
-//     const identity = await ctx.auth.getUserIdentity();
+export const addComment = mutation({
+  args: {
+    postId: v.id("posts"),
+    content: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
 
-//     if (!identity) {
-//       throw new Error('Not authenticated');
-//     }
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
 
-//     const user = await ctx.db
-//       .query('users')
-//       .withIndex('by_clerk_id', (q) => q.eq('clerkId', identity.subject))
-//       .first();
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .first();
 
-//     if (!user) {
-//       throw new Error('User not found');
-//     }
+    if (!user) {
+      throw new Error("User not found");
+    }
 
-//     const post = await ctx.db.get(args.postId);
-//     if (!post) {
-//       throw new Error('Post not found');
-//     }
+    const post = await ctx.db.get(args.postId);
+    if (!post) {
+      throw new Error("Post not found");
+    }
 
-//     const newComment = {
-//       userId: user._id,
-//       content: args.content.trim(),
-//       createdAt: Date.now(),
-//     };
+    const newComment = {
+      userId: user._id,
+      content: args.content.trim(),
+      createdAt: Date.now(),
+    };
 
-//     await ctx.db.patch(args.postId, {
-//       comments: [...post.comments, newComment],
-//       updatedAt: Date.now(),
-//     });
+    await ctx.db.patch(args.postId, {
+      comments: [...post.comments, newComment],
+      updatedAt: Date.now(),
+    });
 
-//     return {
-//       ...newComment,
-//       userName: user.name,
-//       userImageUrl: user.imageUrl || null,
-//     };
-//   },
-// });
+    return {
+      ...newComment,
+      userName: user.name,
+      userImageUrl: user.imageUrl || null,
+    };
+  },
+});
 
 /**
  * Delete a post (only by author)

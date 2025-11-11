@@ -22,15 +22,14 @@ export default defineSchema({
     authorId: v.id("users"),
     content: v.string(),
     imageUrl: v.optional(v.string()),
-    tags: v.optional(v.array(v.string())),
     likes: v.array(v.string()),
-    // comments: v.array(
-    //   v.object({
-    //     userId: v.id('users'),
-    //     content: v.string(),
-    //     createdAt: v.number(),
-    //   })
-    // ),
+    comments: v.array(
+      v.object({
+        userId: v.id("users"),
+        content: v.string(),
+        createdAt: v.number(),
+      })
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

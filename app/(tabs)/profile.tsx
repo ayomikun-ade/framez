@@ -6,6 +6,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMutation, useQuery } from "convex/react";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   Alert,
@@ -24,6 +25,7 @@ export default function ProfileScreen() {
   );
   const deletePost = useMutation(api.posts.deletePost);
   const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -88,8 +90,15 @@ export default function ProfileScreen() {
         My Posts ({userPosts?.length})
       </ThemedText>
       {userPosts && userPosts?.length <= 0 ? (
-        <View>
-          <Ionicons size={64} name="file-tray-outline" />
+        <View
+          style={{
+            alignItems: "center",
+            marginTop: 48,
+            flex: 1,
+            justifyContent: "center",
+          }}
+        >
+          <Ionicons size={64} name="file-tray-outline" color="#ecedee" />
           <ThemedText style={{ textAlign: "center" }}>
             You don&apos;t have any posts yet
           </ThemedText>
@@ -103,6 +112,7 @@ export default function ProfileScreen() {
           }
           renderItem={({ item }) => {
             const likeCount = item.likes.length;
+            const commentCount = item.comments.length;
 
             return (
               <View style={styles.postContainer}>
@@ -126,6 +136,24 @@ export default function ProfileScreen() {
                         {likeCount}
                       </ThemedText>
                     </View>
+                    <TouchableOpacity
+                      style={styles.likesDisplay}
+                      onPress={() =>
+                        router.push({
+                          pathname: "/post/[id]",
+                          params: { id: item._id },
+                        })
+                      }
+                    >
+                      <Ionicons
+                        name="chatbubble-outline"
+                        size={14}
+                        color="#999"
+                      />
+                      <ThemedText style={styles.likeCount}>
+                        {commentCount}
+                      </ThemedText>
+                    </TouchableOpacity>
                   </View>
                   <TouchableOpacity onPress={() => handleDeletePost(item._id)}>
                     <Ionicons name="trash-outline" size={20} color="red" />
@@ -145,7 +173,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
+    // justifyContent: "center",
     padding: 24,
     marginTop: 48,
   },
