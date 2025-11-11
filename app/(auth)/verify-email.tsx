@@ -1,5 +1,7 @@
 import { ThemedText } from "@/components/themed-text"; // Assuming this is imported
+import { api } from "@/convex/_generated/api";
 import { useSignUp } from "@clerk/clerk-expo";
+import { useMutation } from "convex/react";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -18,6 +20,7 @@ export default function VerifyEmailPage() {
   const inputsRef = useRef<(TextInput | null)[]>([]);
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
+  const createOrUpdateUser = useMutation(api.users.createOrUpdateUser);
 
   useEffect(() => {
     inputsRef.current[0]?.focus();
@@ -95,6 +98,10 @@ export default function VerifyEmailPage() {
 
       if (signUpAttempt.status === "complete") {
         await setActive({ session: signUpAttempt.createdSessionId });
+        await createOrUpdateUser({
+          name: signUp.firstName ?? undefined,
+          email: signUp.emailAddress ?? undefined,
+        });
         router.replace("/");
       } else {
         console.error(JSON.stringify(signUpAttempt, null, 2));

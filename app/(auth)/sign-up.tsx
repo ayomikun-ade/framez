@@ -15,6 +15,7 @@ export default function SignUpScreen() {
   const router = useRouter();
 
   const [emailAddress, setEmailAddress] = React.useState("");
+  const [name, setName] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
@@ -24,6 +25,7 @@ export default function SignUpScreen() {
     try {
       await signUp.create({
         emailAddress,
+        firstName: name,
         username,
         password,
       });
@@ -59,6 +61,15 @@ export default function SignUpScreen() {
         Create your account
       </ThemedText>
       <View style={{ marginVertical: 12 }}>
+        <ThemedText>Name</ThemedText>
+        <TextInput
+          style={styles.textInput}
+          autoCapitalize="none"
+          value={name}
+          placeholder="Enter email"
+          placeholderTextColor="#999"
+          onChangeText={(name) => setName(name)}
+        />
         <ThemedText>Email</ThemedText>
         <TextInput
           style={styles.textInput}
@@ -114,14 +125,14 @@ const styles = StyleSheet.create({
     borderColor: "#aeaeae",
     borderRadius: 12,
     width: "100%",
-    height: 40, // Added height for consistency
+    height: 40,
   },
   continueButton: {
     backgroundColor: "white",
     marginHorizontal: "auto",
     marginVertical: 8,
     paddingHorizontal: 24,
-    paddingVertical: 8, // Adjusted padding for better look
+    paddingVertical: 8,
     borderRadius: 8,
   },
 });
