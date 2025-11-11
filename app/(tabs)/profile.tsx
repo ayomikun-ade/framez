@@ -6,10 +6,11 @@ import { Id } from "@/convex/_generated/dataModel";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMutation, useQuery } from "convex/react";
 import { Image } from "expo-image";
-import React from "react";
+import React, { useCallback, useState } from "react";
 import {
   Alert,
   FlatList,
+  RefreshControl,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -22,6 +23,15 @@ export default function ProfileScreen() {
     currentUser ? { authorId: currentUser._id } : "skip"
   );
   const deletePost = useMutation(api.posts.deletePost);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    // Convex automatically refetches data in real-time
+    // Add a small delay for better UX
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setRefreshing(false);
+  }, []);
 
   const handleDeletePost = (postId: string) => {
     Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
@@ -69,19 +79,34 @@ export default function ProfileScreen() {
       <FlatList
         data={userPosts}
         keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={styles.postContainer}>
-            <ThemedText style={styles.postContent}>{item.content}</ThemedText>
-            <View style={styles.postFooter}>
-              <ThemedText style={styles.timestamp}>
-                {formatTimeAgo(item.createdAt)}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        renderItem={({ item }) => {
+          const likeCount = item.likes.length;
+
+          return (
+            <View style={styles.postContainer}>
+              <ThemedText style={styles.postContent}>
+                {item.content}
               </ThemedText>
-              <TouchableOpacity onPress={() => handleDeletePost(item._id)}>
-                <Ionicons name="trash-outline" size={20} color="red" />
-              </TouchableOpacity>
+              <View style={styles.postFooter}>
+                <View style={styles.postInfo}>
+                  <ThemedText style={styles.timestamp}>
+                    {formatTimeAgo(item.createdAt)}
+                  </ThemedText>
+                  <View style={styles.likesDisplay}>
+                    <Ionicons name="heart" size={16} color="#ff4444" />
+                    <ThemedText style={styles.likeCount}>{likeCount}</ThemedText>
+                  </View>
+                </View>
+                <TouchableOpacity onPress={() => handleDeletePost(item._id)}>
+                  <Ionicons name="trash-outline" size={20} color="red" />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
+          );
+        }}
         style={styles.postsList}
       />
     </View>
@@ -94,6 +119,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
+    marginTop: 24,
   },
   profileImage: {
     width: 120,
@@ -130,6 +156,20 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   timestamp: {
+    color: "#999",
+    fontSize: 12,
+  },
+  postInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  likesDisplay: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  likeCount: {
     color: "#999",
     fontSize: 12,
   },

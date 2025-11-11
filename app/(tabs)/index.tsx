@@ -1,13 +1,39 @@
 import { ThemedText } from "@/components/themed-text";
 import { formatTimeAgo } from "@/constants/functions";
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { Id } from "@/convex/_generated/dataModel";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useMutation, useQuery } from "convex/react";
 import { Image } from "expo-image";
-import React from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import {
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function HomeScreen() {
   const posts = useQuery(api.posts.getAllPosts);
+  const currentUser = useQuery(api.users.getCurrentUser);
+  const likePost = useMutation(api.posts.likePost);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setRefreshing(false);
+  }, []);
+
+  const handleLike = async (postId: string) => {
+    try {
+      const convexPostId = postId as Id<"posts">;
+      await likePost({ postId: convexPostId });
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -17,32 +43,59 @@ export default function HomeScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={styles.postContainer}>
-            <View style={styles.postHeader}>
-              <View style={styles.authorContainer}>
-                {item.authorImageUrl && (
-                  <Image
-                    source={{ uri: item.authorImageUrl }}
-                    style={styles.authorImage}
-                  />
-                )}
-                <View>
-                  <ThemedText style={styles.authorName}>
-                    {item.authorName}
-                  </ThemedText>
-                  <ThemedText style={styles.authorUsername}>
-                    @{item.authorUsername}
-                  </ThemedText>
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        renderItem={({ item }) => {
+          const isLiked = currentUser
+            ? item.likes.includes(currentUser._id)
+            : false;
+          const likeCount = item.likes.length;
+
+          return (
+            <View style={styles.postContainer}>
+              <View style={styles.postHeader}>
+                <View style={styles.authorContainer}>
+                  {item.authorImageUrl && (
+                    <Image
+                      source={{ uri: item.authorImageUrl }}
+                      style={styles.authorImage}
+                    />
+                  )}
+                  <View>
+                    <ThemedText style={styles.authorName}>
+                      {item.authorName}
+                    </ThemedText>
+                    <ThemedText style={styles.authorUsername}>
+                      @{item.authorUsername}
+                    </ThemedText>
+                  </View>
                 </View>
+                <ThemedText style={styles.timestamp}>
+                  {formatTimeAgo(item.createdAt)}
+                </ThemedText>
               </View>
-              <ThemedText style={styles.timestamp}>
-                {formatTimeAgo(item.createdAt)}
+              <ThemedText style={styles.postContent}>
+                {item.content}
               </ThemedText>
+              <View style={styles.postFooter}>
+                <TouchableOpacity
+                  style={styles.likeButton}
+                  onPress={() => handleLike(item._id)}
+                >
+                  <Ionicons
+                    name={isLiked ? "heart" : "heart-outline"}
+                    size={20}
+                    color={isLiked ? "#ff4444" : "#999"}
+                  />
+                  <ThemedText style={styles.likeCount}>
+                    {likeCount}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
             </View>
-            <ThemedText style={styles.postContent}>{item.content}</ThemedText>
-          </View>
-        )}
+          );
+        }}
       />
     </View>
   );
@@ -56,6 +109,8 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     marginBottom: 24,
+    paddingTop: 24,
+    fontSize: 48,
   },
   postContainer: {
     marginBottom: 24,
@@ -91,5 +146,20 @@ const styles = StyleSheet.create({
   timestamp: {
     color: "#999",
     fontSize: 12,
+  },
+  postFooter: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#222",
+  },
+  likeButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  likeCount: {
+    color: "#999",
+    fontSize: 14,
   },
 });
