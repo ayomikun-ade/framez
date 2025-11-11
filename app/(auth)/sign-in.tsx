@@ -95,6 +95,11 @@ export default function Page() {
             />
           </TouchableOpacity>
         </View>
+<View style={{ alignItems: "flex-end" }}>
+          <Link href="/(auth)/forgot-password">
+            <ThemedText type="link">Forgot password?</ThemedText>
+          </Link>
+        </View>
       </View>
       <TouchableOpacity
         onPress={onSignInPress}
