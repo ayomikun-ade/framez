@@ -1,6 +1,9 @@
+import { ManropeFonts } from "@/constants/theme";
 import { useClerk } from "@clerk/clerk-expo";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import { Text, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
+import { ThemedText } from "./themed-text";
 
 export const SignOutButton = () => {
   const { signOut } = useClerk();
@@ -16,10 +19,26 @@ export const SignOutButton = () => {
   };
   return (
     <TouchableOpacity
-      style={{ backgroundColor: "white" }}
+      style={{
+        backgroundColor: "red",
+        marginHorizontal: "auto",
+        marginVertical: 8,
+        paddingHorizontal: 24,
+        paddingVertical: 8,
+        borderRadius: 8,
+      }}
       onPress={handleSignOut}
     >
-      <Text>Sign out</Text>
+      <ThemedText
+        style={{
+          color: "white",
+          fontFamily: ManropeFonts.bold,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+      >
+        <Ionicons name="log-out-outline" size={20} /> Sign out
+      </ThemedText>
     </TouchableOpacity>
   );
 };

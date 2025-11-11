@@ -47,15 +47,17 @@ export const createOrUpdateUser = mutation({
     const clerkId = profile.subject;
     const email = args.email || profile.email || "";
     const name = args.name || profile.name || email.split("@")[0] || "User";
-    const emailUsername = email.split("@")[0] || "user";
-    const cleanUsername = emailUsername
-      .replace(/[^a-z0-9]/gi, "")
-      .toLowerCase();
-    const username =
-      args.username ||
-      cleanUsername ||
-      `user${Math.floor(Math.random() * 1000)}`;
     const imageUrl = args.imageUrl || profile.pictureUrl || "";
+
+    let username = profile.nickname;
+
+    if (!username) {
+      const emailUsername = email.split("@")[0] || "user";
+      const cleanUsername = emailUsername
+        .replace(/[^a-z0-9]/gi, "")
+        .toLowerCase();
+      username = cleanUsername || `user${Math.floor(Math.random() * 1000)}`;
+    }
 
     // Check if user already exists
     const existingUser = await ctx.db

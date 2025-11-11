@@ -1,109 +1,95 @@
-import { Image } from "expo-image";
-import { Platform, StyleSheet } from "react-native";
-
-import { HelloWave } from "@/components/hello-wave";
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { SignOutButton } from "@/components/sign-out-button";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Link } from "expo-router";
+import { formatTimeAgo } from "@/constants/functions";
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
+import { Image } from "expo-image";
+import React from "react";
+import { FlatList, StyleSheet, View } from "react-native";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image
-          source={require("@/assets/images/partial-react-logo.png")}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <SignOutButton />
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{" "}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText>{" "}
-          to see changes. Press{" "}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: "cmd + d",
-              android: "cmd + m",
-              web: "F12",
-            })}
-          </ThemedText>{" "}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction
-              title="Action"
-              icon="cube"
-              onPress={() => alert("Action pressed")}
-            />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert("Share pressed")}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert("Delete pressed")}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const posts = useQuery(api.posts.getAllPosts);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">
-            npm run reset-project
-          </ThemedText>{" "}
-          to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-          directory. This will move the current{" "}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  return (
+    <View style={styles.container}>
+      <ThemedText type="title" style={styles.title}>
+        Feed
+      </ThemedText>
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <View style={styles.postContainer}>
+            <View style={styles.postHeader}>
+              <View style={styles.authorContainer}>
+                {item.authorImageUrl && (
+                  <Image
+                    source={{ uri: item.authorImageUrl }}
+                    style={styles.authorImage}
+                  />
+                )}
+                <View>
+                  <ThemedText style={styles.authorName}>
+                    {item.authorName}
+                  </ThemedText>
+                  <ThemedText style={styles.authorUsername}>
+                    @{item.authorUsername}
+                  </ThemedText>
+                </View>
+              </View>
+              <ThemedText style={styles.timestamp}>
+                {formatTimeAgo(item.createdAt)}
+              </ThemedText>
+            </View>
+            <ThemedText style={styles.postContent}>{item.content}</ThemedText>
+          </View>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    padding: 24,
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  postContainer: {
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "#333",
+    padding: 16,
+    borderRadius: 8,
+  },
+  postHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  authorContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
+  authorImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  authorName: {
+    fontWeight: "bold",
+  },
+  authorUsername: {
+    color: "#999",
+  },
+  postContent: {
+    marginTop: 8,
+  },
+  timestamp: {
+    color: "#999",
+    fontSize: 12,
   },
 });
