@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { useSignIn } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import React from "react";
 import {
@@ -16,6 +17,7 @@ export default function Page() {
 
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const onSignInPress = async () => {
     if (!isLoaded) return;
@@ -72,15 +74,27 @@ export default function Page() {
           onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
         />
         <ThemedText>Password</ThemedText>
-        <TextInput
-          style={styles.textInput}
-          autoCapitalize="none"
-          value={password}
-          placeholder="Enter password"
-          placeholderTextColor="#999"
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            autoCapitalize="none"
+            value={password}
+            placeholder="Enter password"
+            placeholderTextColor="#999"
+            secureTextEntry={!showPassword}
+            onChangeText={(password) => setPassword(password)}
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeIcon}
+          >
+            <Ionicons
+              name={showPassword ? "eye-off" : "eye"}
+              size={18}
+              color="#aeaeae"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       <TouchableOpacity
         onPress={onSignInPress}
@@ -118,5 +132,24 @@ const styles = StyleSheet.create({
     borderColor: "#aeaeae",
     borderRadius: 12,
     width: "100%",
+    height: 40,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginVertical: 8,
+    borderColor: "#aeaeae",
+    borderWidth: 1,
+    borderRadius: 12,
+  },
+  passwordInput: {
+    color: "white",
+    paddingHorizontal: 8,
+    flex: 1,
+    height: 40,
+  },
+  eyeIcon: {
+    padding: 8,
   },
 });

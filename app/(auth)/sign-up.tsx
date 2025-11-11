@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components/themed-text"; // Assuming this is imported
 import { useSignUp } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import * as React from "react";
 import {
@@ -18,6 +19,7 @@ export default function SignUpScreen() {
   const [name, setName] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
@@ -89,15 +91,27 @@ export default function SignUpScreen() {
           onChangeText={(username) => setUsername(username)}
         />
         <ThemedText>Password</ThemedText>
-        <TextInput
-          style={styles.textInput}
-          autoCapitalize="none"
-          value={password}
-          placeholder="Enter password"
-          placeholderTextColor="#999"
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            autoCapitalize="none"
+            value={password}
+            placeholder="Enter password"
+            placeholderTextColor="#999"
+            secureTextEntry={!showPassword}
+            onChangeText={(password) => setPassword(password)}
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeIcon}
+          >
+            <Ionicons
+              name={showPassword ? "eye-off" : "eye"}
+              size={18}
+              color="#aeaeae"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       <TouchableOpacity onPress={onSignUpPress} style={styles.continueButton}>
         <ThemedText style={{ textAlign: "center", color: "black" }}>
@@ -134,5 +148,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 8,
     borderRadius: 8,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginVertical: 8,
+    borderColor: "#aeaeae",
+    borderWidth: 1,
+    borderRadius: 12,
+  },
+  passwordInput: {
+    color: "white",
+    paddingHorizontal: 8,
+    flex: 1,
+    height: 40,
+  },
+  eyeIcon: {
+    padding: 8,
   },
 });

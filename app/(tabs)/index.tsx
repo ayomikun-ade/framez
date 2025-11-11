@@ -78,6 +78,12 @@ export default function HomeScreen() {
               <ThemedText style={styles.postContent}>
                 {item.content}
               </ThemedText>
+              {item.imageUrl && (
+                <Image
+                  source={{ uri: item.imageUrl }}
+                  style={styles.postImage}
+                />
+              )}
               <View style={styles.postFooter}>
                 <TouchableOpacity
                   style={styles.likeButton}
@@ -142,6 +148,12 @@ const styles = StyleSheet.create({
   },
   postContent: {
     marginTop: 8,
+  },
+  postImage: {
+    width: "100%",
+    height: 250,
+    borderRadius: 8,
+    marginTop: 12,
   },
   timestamp: {
     color: "#999",

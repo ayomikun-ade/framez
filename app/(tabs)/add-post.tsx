@@ -1,6 +1,9 @@
 import { ThemedText } from "@/components/themed-text";
 import { api } from "@/convex/_generated/api";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMutation } from "convex/react";
+import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -13,8 +16,41 @@ import {
 
 export default function AddPostScreen() {
   const [content, setContent] = useState("");
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const createPost = useMutation(api.posts.createPost);
   const router = useRouter();
+
+  const pickImage = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Alert.alert(
+        "Permission Required",
+        "Please grant camera roll permissions to add images."
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      // Store as data URI for simplicity
+      const base64 = result.assets[0].base64;
+      const dataUri = `data:image/jpeg;base64,${base64}`;
+      setImageUri(dataUri);
+    }
+  };
+
+  const removeImage = () => {
+    setImageUri(null);
+  };
 
   const handleCreatePost = async () => {
     if (!content.trim()) {
@@ -23,8 +59,12 @@ export default function AddPostScreen() {
     }
 
     try {
-      await createPost({ content });
+      await createPost({
+        content,
+        imageUrl: imageUri || undefined,
+      });
       setContent("");
+      setImageUri(null);
       router.push("/(tabs)");
     } catch (error) {
       console.error("Failed to create post:", error);
@@ -44,6 +84,23 @@ export default function AddPostScreen() {
         onChangeText={setContent}
         multiline
       />
+
+      {imageUri && (
+        <View style={styles.imagePreviewContainer}>
+          <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+          <TouchableOpacity style={styles.removeButton} onPress={removeImage}>
+            <Ionicons name="close-circle" size={32} color="#ff4444" />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+        <Ionicons name="image-outline" size={24} color="white" />
+        <ThemedText style={styles.imageButtonText}>
+          {imageUri ? "Change Image" : "Add Image"}
+        </ThemedText>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={handleCreatePost}>
         <ThemedText style={styles.buttonText}>Post</ThemedText>
       </TouchableOpacity>
@@ -85,5 +142,41 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "black",
     fontWeight: "600",
+  },
+  imageButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#aeaeae",
+    borderRadius: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    marginVertical: 8,
+  },
+  imageButtonText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  imagePreviewContainer: {
+    position: "relative",
+    marginVertical: 12,
+    alignItems: "center",
+  },
+  imagePreview: {
+    width: "100%",
+    height: 300,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#333",
+  },
+  removeButton: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    // backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 16,
   },
 });
