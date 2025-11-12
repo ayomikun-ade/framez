@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import * as React from "react";
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -23,10 +24,11 @@ export default function SignUpScreen() {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const onSignUpPress = async () => {
-    if (!isLoaded) return;
-
+    if (!isLoaded || loading) return;
+    setLoading(true);
     try {
       await signUp.create({
         emailAddress,
@@ -45,6 +47,8 @@ export default function SignUpScreen() {
         errAny?.message ||
         "An unexpected error occurred";
       Alert.alert(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -117,10 +121,18 @@ export default function SignUpScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        <TouchableOpacity onPress={onSignUpPress} style={styles.continueButton}>
-          <ThemedText style={{ textAlign: "center", color: "black" }}>
-            Continue
-          </ThemedText>
+        <TouchableOpacity
+          onPress={onSignUpPress}
+          style={[styles.button, loading && styles.buttonDisabled]}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <ThemedText style={{ textAlign: "center", color: "black" }}>
+              Continue
+            </ThemedText>
+          )}
         </TouchableOpacity>
         <View>
           <ThemedText style={{ textAlign: "center" }}>
@@ -158,13 +170,18 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 40,
   },
-  continueButton: {
+  button: {
     backgroundColor: "white",
     marginHorizontal: "auto",
     marginVertical: 8,
     paddingHorizontal: 24,
     paddingVertical: 8,
     borderRadius: 8,
+    minHeight: 38,
+    justifyContent: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#ccc",
   },
   passwordContainer: {
     flexDirection: "row",

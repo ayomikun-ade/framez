@@ -3,6 +3,7 @@ import { useSignIn } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import * as React from "react";
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -20,10 +21,11 @@ export default function ForgotPasswordScreen() {
   const [password, setPassword] = React.useState("");
   const [code, setCode] = React.useState("");
   const [successfulCreation, setSuccessfulCreation] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const onRequestReset = async () => {
-    if (!isLoaded) return;
-
+    if (!isLoaded || loading) return;
+    setLoading(true);
     try {
       await signIn.create({
         strategy: "reset_password_email_code",
@@ -32,12 +34,14 @@ export default function ForgotPasswordScreen() {
       setSuccessfulCreation(true);
     } catch (err: any) {
       Alert.alert(err.errors[0].message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const onReset = async () => {
-    if (!isLoaded) return;
-
+    if (!isLoaded || loading) return;
+    setLoading(true);
     try {
       const result = await signIn.attemptFirstFactor({
         strategy: "reset_password_email_code",
@@ -50,6 +54,8 @@ export default function ForgotPasswordScreen() {
       router.replace("/");
     } catch (err: any) {
       Alert.alert(err.errors[0].message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,8 +87,16 @@ export default function ForgotPasswordScreen() {
                 style={styles.textInput}
               />
             </View>
-            <TouchableOpacity onPress={onRequestReset} style={styles.button}>
-              <ThemedText style={styles.buttonText}>Send Code</ThemedText>
+            <TouchableOpacity
+              onPress={onRequestReset}
+              style={[styles.button, loading && styles.buttonDisabled]}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#000" />
+              ) : (
+                <ThemedText style={styles.buttonText}>Send Code</ThemedText>
+              )}
             </TouchableOpacity>
           </>
         )}
@@ -109,8 +123,18 @@ export default function ForgotPasswordScreen() {
                 style={styles.textInput}
               />
             </View>
-            <TouchableOpacity onPress={onReset} style={styles.button}>
-              <ThemedText style={styles.buttonText}>Reset Password</ThemedText>
+            <TouchableOpacity
+              onPress={onReset}
+              style={[styles.button, loading && styles.buttonDisabled]}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#000" />
+              ) : (
+                <ThemedText style={styles.buttonText}>
+                  Reset Password
+                </ThemedText>
+              )}
             </TouchableOpacity>
           </>
         )}
@@ -168,6 +192,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 8,
     borderRadius: 8,
+    minHeight: 38,
+    justifyContent: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#ccc",
   },
   buttonText: {
     textAlign: "center",

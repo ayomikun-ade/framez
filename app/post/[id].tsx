@@ -26,10 +26,11 @@ export default function PostDetailScreen() {
   const currentUser = useQuery(api.users.getCurrentUser);
 
   const [newComment, setNewComment] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleAddComment = async () => {
-    if (!newComment.trim() || !currentUser) return;
-
+    if (!newComment.trim() || !currentUser || loading) return;
+    setLoading(true);
     try {
       await addComment({
         postId: postId,
@@ -38,6 +39,8 @@ export default function PostDetailScreen() {
       setNewComment("");
     } catch (error) {
       console.error("Error adding comment:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,7 +58,6 @@ export default function PostDetailScreen() {
       keyboardVerticalOffset={100}
       style={styles.container}
     >
-      {/* <View > */}
       <FlatList
         ListHeaderComponent={
           <View style={styles.postContainer}>
@@ -127,12 +129,19 @@ export default function PostDetailScreen() {
           value={newComment}
           onChangeText={setNewComment}
         />
-        <TouchableOpacity style={styles.sendButton} onPress={handleAddComment}>
-          <Ionicons name="send" size={20} color="#000" />
+        <TouchableOpacity
+          style={[styles.sendButton, loading && styles.buttonDisabled]}
+          onPress={handleAddComment}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <Ionicons name="send" size={20} color="#000" />
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
-    // </View>
   );
 }
 
@@ -218,6 +227,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: "#333",
+    marginBottom: 64,
   },
   commentInput: {
     flex: 1,
@@ -230,7 +240,14 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     backgroundColor: "white",
-    borderRadius: "50%",
+    borderRadius: 25,
     padding: 10,
+    width: 45,
+    height: 45,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#ccc",
   },
 });

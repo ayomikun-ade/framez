@@ -8,6 +8,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   RefreshControl,
   StyleSheet,
@@ -42,7 +43,11 @@ export default function HomeScreen() {
       <ThemedText type="title" style={styles.title}>
         Feed
       </ThemedText>
-      {posts && posts?.length <= 0 ? (
+      {!posts ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      ) : posts.length <= 0 ? (
         <View
           style={{
             alignItems: "center",
@@ -151,6 +156,11 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     width: "100%",
     alignSelf: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     textAlign: "center",

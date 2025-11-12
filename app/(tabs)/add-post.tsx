@@ -7,6 +7,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -19,6 +20,7 @@ import {
 export default function AddPostScreen() {
   const [content, setContent] = useState("");
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const createPost = useMutation(api.posts.createPost);
   const router = useRouter();
 
@@ -59,7 +61,8 @@ export default function AddPostScreen() {
       Alert.alert("Error", "Post content cannot be empty.");
       return;
     }
-
+    if (loading) return;
+    setLoading(true);
     try {
       await createPost({
         content,
@@ -70,6 +73,8 @@ export default function AddPostScreen() {
       router.push("/(tabs)");
     } catch (error) {
       console.error("Failed to create post:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -107,8 +112,16 @@ export default function AddPostScreen() {
           </ThemedText>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleCreatePost}>
-          <ThemedText style={styles.buttonText}>Post</ThemedText>
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleCreatePost}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <ThemedText style={styles.buttonText}>Post</ThemedText>
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -151,6 +164,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     alignItems: "center",
+    minHeight: 38,
+    justifyContent: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#ccc",
   },
   buttonText: {
     color: "black",

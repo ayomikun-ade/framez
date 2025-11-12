@@ -9,6 +9,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   FlatList,
   RefreshControl,
@@ -25,6 +26,7 @@ export default function ProfileScreen() {
   );
   const deletePost = useMutation(api.posts.deletePost);
   const [refreshing, setRefreshing] = useState(false);
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
   const router = useRouter();
 
   const onRefresh = useCallback(async () => {
@@ -42,8 +44,11 @@ export default function ProfileScreen() {
       {
         text: "Delete",
         onPress: () => {
+          setDeletingPostId(postId);
           const convexPostId = postId as Id<"posts">;
-          deletePost({ postId: convexPostId });
+          deletePost({ postId: convexPostId }).finally(() =>
+            setDeletingPostId(null)
+          );
         },
         style: "destructive",
       },
@@ -52,8 +57,8 @@ export default function ProfileScreen() {
 
   if (!currentUser) {
     return (
-      <View style={styles.container}>
-        <ThemedText>Loading Profile...</ThemedText>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#fff" />
       </View>
     );
   }
@@ -87,17 +92,14 @@ export default function ProfileScreen() {
           width: "100%",
         }}
       >
-        My Posts ({userPosts?.length})
+        My Posts {userPosts ? `(${userPosts.length})` : ""}
       </ThemedText>
-      {userPosts && userPosts?.length <= 0 ? (
-        <View
-          style={{
-            alignItems: "center",
-            marginTop: 48,
-            flex: 1,
-            justifyContent: "center",
-          }}
-        >
+      {!userPosts ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
+      ) : userPosts.length <= 0 ? (
+        <View style={styles.emptyContainer}>
           <Ionicons size={64} name="file-tray-outline" color="#ecedee" />
           <ThemedText style={{ textAlign: "center" }}>
             You don&apos;t have any posts yet
@@ -113,6 +115,7 @@ export default function ProfileScreen() {
           renderItem={({ item }) => {
             const likeCount = item.likes.length;
             const commentCount = item.comments.length;
+            const isDeleting = deletingPostId === item._id;
 
             return (
               <View style={styles.postContainer}>
@@ -155,8 +158,15 @@ export default function ProfileScreen() {
                       </ThemedText>
                     </TouchableOpacity>
                   </View>
-                  <TouchableOpacity onPress={() => handleDeletePost(item._id)}>
-                    <Ionicons name="trash-outline" size={20} color="red" />
+                  <TouchableOpacity
+                    onPress={() => handleDeletePost(item._id)}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <ActivityIndicator color="red" />
+                    ) : (
+                      <Ionicons name="trash-outline" size={20} color="red" />
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>
@@ -178,6 +188,17 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     width: "100%",
     alignSelf: "center",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyContainer: {
+    alignItems: "center",
+    marginTop: 48,
+    flex: 1,
+    justifyContent: "center",
   },
   header: {
     flexDirection: "row",

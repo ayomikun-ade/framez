@@ -4,13 +4,11 @@ import React, { useEffect } from "react";
 import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
 import { api } from "@/convex/_generated/api";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAuth } from "@clerk/clerk-expo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMutation } from "convex/react";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const createOrUpdateUser = useMutation(api.users.createOrUpdateUser);
   const { isSignedIn } = useAuth();
 
@@ -25,7 +23,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors["dark"].tint,
         headerShown: false,
         tabBarButton: HapticTab,
       }}

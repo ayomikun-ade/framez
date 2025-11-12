@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import React from "react";
 import {
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -20,10 +21,11 @@ export default function Page() {
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const onSignInPress = async () => {
-    if (!isLoaded) return;
-
+    if (!isLoaded || loading) return;
+    setLoading(true);
     try {
       const signInAttempt = await signIn.create({
         identifier: emailAddress,
@@ -45,6 +47,8 @@ export default function Page() {
         errAny?.message ||
         "An unexpected error occurred";
       Alert.alert(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,18 +107,16 @@ export default function Page() {
         </View>
         <TouchableOpacity
           onPress={onSignInPress}
-          style={{
-            backgroundColor: "white",
-            marginHorizontal: "auto",
-            marginVertical: 8,
-            paddingHorizontal: 24,
-            paddingVertical: 4,
-            borderRadius: 8,
-          }}
+          style={[styles.button, loading && styles.buttonDisabled]}
+          disabled={loading}
         >
-          <ThemedText style={{ textAlign: "center", color: "black" }}>
-            Continue
-          </ThemedText>
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <ThemedText style={{ textAlign: "center", color: "black" }}>
+              Continue
+            </ThemedText>
+          )}
         </TouchableOpacity>
         <View>
           <ThemedText style={{ textAlign: "center" }}>
@@ -168,5 +170,18 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     padding: 8,
+  },
+  button: {
+    backgroundColor: "white",
+    marginHorizontal: "auto",
+    marginVertical: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+    borderRadius: 8,
+    minHeight: 36,
+    justifyContent: "center",
+  },
+  buttonDisabled: {
+    backgroundColor: "#ccc",
   },
 });
