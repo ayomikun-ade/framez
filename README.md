@@ -482,11 +482,7 @@ Contributions to the Framez project are welcome. Please adhere to the following 
 
 ## Author Info
 
-**Ayomikun Adeyeye**
-
-- LinkedIn: [https://linkedin.com/in/ayoadeosun10](https://linkedin.com/in/ayoadeosun10)
-- Twitter: [https://twitter.com/ayoadeosun10](https://twitter.com/ayoadeosun10)
-
+Meeee
 ---
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
