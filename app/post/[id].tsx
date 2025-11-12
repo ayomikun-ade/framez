@@ -140,6 +140,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#000",
+    maxWidth: 400,
+    width: "100%",
+    alignSelf: "center",
   },
   loadingContainer: {
     flex: 1,

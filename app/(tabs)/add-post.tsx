@@ -8,6 +8,8 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -72,47 +74,58 @@ export default function AddPostScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Create a new post
-      </ThemedText>
-      <TextInput
-        style={styles.textInput}
-        placeholder="What's on your mind?"
-        placeholderTextColor="#999"
-        value={content}
-        onChangeText={setContent}
-        multiline
-      />
-
-      {imageUri && (
-        <View style={styles.imagePreviewContainer}>
-          <Image source={{ uri: imageUri }} style={styles.imagePreview} />
-          <TouchableOpacity style={styles.removeButton} onPress={removeImage}>
-            <Ionicons name="close-circle" size={32} color="#ff4444" />
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
-        <Ionicons name="image-outline" size={24} color="white" />
-        <ThemedText style={styles.imageButtonText}>
-          {imageUri ? "Change Image" : "Add Image"}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <View style={styles.innerContainer}>
+        <ThemedText type="title" style={styles.title}>
+          Create a new post
         </ThemedText>
-      </TouchableOpacity>
+        <TextInput
+          style={styles.textInput}
+          placeholder="What's on your mind?"
+          placeholderTextColor="#999"
+          value={content}
+          onChangeText={setContent}
+          multiline
+        />
 
-      <TouchableOpacity style={styles.button} onPress={handleCreatePost}>
-        <ThemedText style={styles.buttonText}>Post</ThemedText>
-      </TouchableOpacity>
-    </View>
+        {imageUri && (
+          <View style={styles.imagePreviewContainer}>
+            <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+            <TouchableOpacity style={styles.removeButton} onPress={removeImage}>
+              <Ionicons name="close-circle" size={32} color="#ff4444" />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+          <Ionicons name="image-outline" size={24} color="white" />
+          <ThemedText style={styles.imageButtonText}>
+            {imageUri ? "Change Image" : "Add Image"}
+          </ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={handleCreatePost}>
+          <ThemedText style={styles.buttonText}>Post</ThemedText>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
+  },
+  innerContainer: {
+    flex: 1,
     justifyContent: "center",
+    paddingHorizontal: 24,
+    maxWidth: 400,
+    width: "100%",
+    alignSelf: "center",
   },
   title: {
     textAlign: "center",

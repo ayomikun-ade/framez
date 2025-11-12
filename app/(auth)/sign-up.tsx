@@ -144,6 +144,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 24,
     paddingVertical: 48,
+    maxWidth: 400,
+    width: "100%",
+    alignSelf: "center",
   },
   textInput: {
     color: "white",

@@ -173,9 +173,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    // justifyContent: "center",
     padding: 24,
     marginTop: 48,
+    maxWidth: 400,
+    width: "100%",
+    alignSelf: "center",
   },
   header: {
     flexDirection: "row",

@@ -136,6 +136,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 24,
+    maxWidth: 400,
+    width: "100%",
+    alignSelf: "center",
   },
   title: {
     textAlign: "center",
