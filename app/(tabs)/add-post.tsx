@@ -111,6 +111,9 @@ export default function AddPostScreen() {
             {imageUri ? "Change Image" : "Add Image"}
           </ThemedText>
         </TouchableOpacity>
+        <ThemedText style={{ color: "#999", fontSize: 12, marginBottom: 12 }}>
+          Images should be less than 1MB
+        </ThemedText>
 
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
