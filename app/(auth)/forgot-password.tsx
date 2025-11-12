@@ -4,6 +4,8 @@ import { Link, useRouter } from "expo-router";
 import * as React from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -52,77 +54,85 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Framez
-      </ThemedText>
-      <ThemedText type="subtitle" style={styles.subtitle}>
-        {!successfulCreation
-          ? "Reset your password"
-          : "Check your email for a code"}
-      </ThemedText>
-
-      {!successfulCreation && (
-        <>
-          <View style={styles.inputContainer}>
-            <ThemedText>Email</ThemedText>
-            <TextInput
-              autoCapitalize="none"
-              placeholder="Enter your email"
-              placeholderTextColor="#999"
-              value={emailAddress}
-              onChangeText={setEmailAddress}
-              style={styles.textInput}
-            />
-          </View>
-          <TouchableOpacity onPress={onRequestReset} style={styles.button}>
-            <ThemedText style={styles.buttonText}>Send Code</ThemedText>
-          </TouchableOpacity>
-        </>
-      )}
-
-      {successfulCreation && (
-        <>
-          <View style={styles.inputContainer}>
-            <ThemedText>Code</ThemedText>
-            <TextInput
-              value={code}
-              placeholder="Enter the code"
-              placeholderTextColor="#999"
-              onChangeText={setCode}
-              style={styles.textInput}
-            />
-            <ThemedText>New Password</ThemedText>
-            <TextInput
-              placeholder="Enter new password"
-              placeholderTextColor="#999"
-              autoCapitalize="none"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              style={styles.textInput}
-            />
-          </View>
-          <TouchableOpacity onPress={onReset} style={styles.button}>
-            <ThemedText style={styles.buttonText}>Reset Password</ThemedText>
-          </TouchableOpacity>
-        </>
-      )}
-
-      <View style={styles.footer}>
-        <ThemedText style={{ textAlign: "center" }}>
-          Remember your password?
-          <Link href="/sign-in">
-            <ThemedText type="link"> Sign in</ThemedText>
-          </Link>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <View style={styles.innerContainer}>
+        <ThemedText type="title" style={styles.title}>
+          Framez
         </ThemedText>
+        <ThemedText type="subtitle" style={styles.subtitle}>
+          {!successfulCreation
+            ? "Reset your password"
+            : "Check your email for a code"}
+        </ThemedText>
+
+        {!successfulCreation && (
+          <>
+            <View style={styles.inputContainer}>
+              <ThemedText>Email</ThemedText>
+              <TextInput
+                autoCapitalize="none"
+                placeholder="Enter your email"
+                placeholderTextColor="#999"
+                value={emailAddress}
+                onChangeText={setEmailAddress}
+                style={styles.textInput}
+              />
+            </View>
+            <TouchableOpacity onPress={onRequestReset} style={styles.button}>
+              <ThemedText style={styles.buttonText}>Send Code</ThemedText>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {successfulCreation && (
+          <>
+            <View style={styles.inputContainer}>
+              <ThemedText>Code</ThemedText>
+              <TextInput
+                value={code}
+                placeholder="Enter the code"
+                placeholderTextColor="#999"
+                onChangeText={setCode}
+                style={styles.textInput}
+              />
+              <ThemedText>New Password</ThemedText>
+              <TextInput
+                placeholder="Enter new password"
+                placeholderTextColor="#999"
+                autoCapitalize="none"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                style={styles.textInput}
+              />
+            </View>
+            <TouchableOpacity onPress={onReset} style={styles.button}>
+              <ThemedText style={styles.buttonText}>Reset Password</ThemedText>
+            </TouchableOpacity>
+          </>
+        )}
+
+        <View style={styles.footer}>
+          <ThemedText style={{ textAlign: "center" }}>
+            Remember your password?
+            <Link href="/sign-in">
+              <ThemedText type="link"> Sign in</ThemedText>
+            </Link>
+          </ThemedText>
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  innerContainer: {
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 24,

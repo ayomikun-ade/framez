@@ -10,6 +10,8 @@ import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -71,7 +73,7 @@ export default function PostDetailScreen() {
                 </View>
               </View>
               <ThemedText style={styles.timestamp}>
-                {formatTimeAgo(post.createdAt)}
+                {new Date(post.createdAt).toLocaleString()}
               </ThemedText>
             </View>
             <ThemedText style={styles.postContent}>{post.content}</ThemedText>
@@ -101,7 +103,9 @@ export default function PostDetailScreen() {
                 <ThemedText>{item.content}</ThemedText>
               </View>
             </View>
-            <ThemedText>{new Date(item.createdAt).toLocaleString()}</ThemedText>
+            <ThemedText style={styles.timestamp}>
+              {formatTimeAgo(item.createdAt)}
+            </ThemedText>
           </View>
         )}
         ListEmptyComponent={
@@ -110,18 +114,26 @@ export default function PostDetailScreen() {
           </ThemedText>
         }
       />
-      <View style={styles.addCommentContainer}>
-        <TextInput
-          style={styles.commentInput}
-          placeholder="Add a comment..."
-          placeholderTextColor="#999"
-          value={newComment}
-          onChangeText={setNewComment}
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={handleAddComment}>
-          <Ionicons name="send" size={20} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={100}
+      >
+        <View style={styles.addCommentContainer}>
+          <TextInput
+            style={styles.commentInput}
+            placeholder="Add a comment..."
+            placeholderTextColor="#999"
+            value={newComment}
+            onChangeText={setNewComment}
+          />
+          <TouchableOpacity
+            style={styles.sendButton}
+            onPress={handleAddComment}
+          >
+            <Ionicons name="send" size={20} color="#000" />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -220,6 +232,6 @@ const styles = StyleSheet.create({
   sendButton: {
     backgroundColor: "white",
     borderRadius: "50%",
-    padding: 12,
+    padding: 10,
   },
 });

@@ -5,6 +5,8 @@ import { Link, useRouter } from "expo-router";
 import React from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -47,88 +49,95 @@ export default function Page() {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        paddingHorizontal: 24,
-      }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
     >
-      <ThemedText type="title" style={{ textAlign: "center", fontSize: 48 }}>
-        Framez
-      </ThemedText>
-      <ThemedText
-        type="subtitle"
-        style={{ textAlign: "center", marginVertical: 8 }}
-      >
-        Welcome back
-      </ThemedText>
-      <View style={{ marginVertical: 12 }}>
-        <ThemedText>Username or email</ThemedText>
-        <TextInput
-          style={styles.textInput}
-          autoCapitalize="none"
-          value={emailAddress}
-          placeholder="Enter email"
-          placeholderTextColor="#999"
-          onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-        />
-        <ThemedText>Password</ThemedText>
-        <View style={styles.passwordContainer}>
+      <View style={styles.innerContainer}>
+        <ThemedText type="title" style={{ textAlign: "center", fontSize: 48 }}>
+          Framez
+        </ThemedText>
+        <ThemedText
+          type="subtitle"
+          style={{ textAlign: "center", marginVertical: 8 }}
+        >
+          Welcome back
+        </ThemedText>
+        <View style={{ marginVertical: 12 }}>
+          <ThemedText>Username or email</ThemedText>
           <TextInput
-            style={styles.passwordInput}
+            style={styles.textInput}
             autoCapitalize="none"
-            value={password}
-            placeholder="Enter password"
+            value={emailAddress}
+            placeholder="Enter email"
             placeholderTextColor="#999"
-            secureTextEntry={!showPassword}
-            onChangeText={(password) => setPassword(password)}
+            onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
           />
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            style={styles.eyeIcon}
-          >
-            <Ionicons
-              name={showPassword ? "eye-off" : "eye"}
-              size={18}
-              color="#aeaeae"
+          <ThemedText>Password</ThemedText>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              autoCapitalize="none"
+              value={password}
+              placeholder="Enter password"
+              placeholderTextColor="#999"
+              secureTextEntry={!showPassword}
+              onChangeText={(password) => setPassword(password)}
             />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off" : "eye"}
+                size={18}
+                color="#aeaeae"
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={{ alignItems: "flex-end" }}>
+            <Link href="/(auth)/forgot-password">
+              <ThemedText type="link">Forgot password?</ThemedText>
+            </Link>
+          </View>
         </View>
-<View style={{ alignItems: "flex-end" }}>
-          <Link href="/(auth)/forgot-password">
-            <ThemedText type="link">Forgot password?</ThemedText>
-          </Link>
+        <TouchableOpacity
+          onPress={onSignInPress}
+          style={{
+            backgroundColor: "white",
+            marginHorizontal: "auto",
+            marginVertical: 8,
+            paddingHorizontal: 24,
+            paddingVertical: 4,
+            borderRadius: 8,
+          }}
+        >
+          <ThemedText style={{ textAlign: "center", color: "black" }}>
+            Continue
+          </ThemedText>
+        </TouchableOpacity>
+        <View>
+          <ThemedText style={{ textAlign: "center" }}>
+            Don&apos;t have an account?
+            <Link href="/sign-up">
+              <ThemedText type="link"> Sign up</ThemedText>
+            </Link>
+          </ThemedText>
         </View>
       </View>
-      <TouchableOpacity
-        onPress={onSignInPress}
-        style={{
-          backgroundColor: "white",
-          marginHorizontal: "auto",
-          marginVertical: 8,
-          paddingHorizontal: 24,
-          paddingVertical: 4,
-          borderRadius: 8,
-        }}
-      >
-        <ThemedText style={{ textAlign: "center", color: "black" }}>
-          Continue
-        </ThemedText>
-      </TouchableOpacity>
-      <View>
-        <ThemedText style={{ textAlign: "center" }}>
-          Don&apos;t have an account?
-          <Link href="/sign-up">
-            <ThemedText type="link"> Sign up</ThemedText>
-          </Link>
-        </ThemedText>
-      </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  innerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
   textInput: {
     color: "white",
     paddingHorizontal: 8,
