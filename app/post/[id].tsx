@@ -5,7 +5,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMutation, useQuery } from "convex/react";
 import { Image } from "expo-image";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -50,8 +50,12 @@ export default function PostDetailScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ title: "Comments" }} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={100}
+      style={styles.container}
+    >
+      {/* <View > */}
       <FlatList
         ListHeaderComponent={
           <View style={styles.postContainer}>
@@ -114,27 +118,21 @@ export default function PostDetailScreen() {
           </ThemedText>
         }
       />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={100}
-      >
-        <View style={styles.addCommentContainer}>
-          <TextInput
-            style={styles.commentInput}
-            placeholder="Add a comment..."
-            placeholderTextColor="#999"
-            value={newComment}
-            onChangeText={setNewComment}
-          />
-          <TouchableOpacity
-            style={styles.sendButton}
-            onPress={handleAddComment}
-          >
-            <Ionicons name="send" size={20} color="#000" />
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </View>
+
+      <View style={styles.addCommentContainer}>
+        <TextInput
+          style={styles.commentInput}
+          placeholder="Add a comment..."
+          placeholderTextColor="#999"
+          value={newComment}
+          onChangeText={setNewComment}
+        />
+        <TouchableOpacity style={styles.sendButton} onPress={handleAddComment}>
+          <Ionicons name="send" size={20} color="#000" />
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+    // </View>
   );
 }
 
