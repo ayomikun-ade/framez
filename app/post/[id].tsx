@@ -192,8 +192,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginTop: 24,
-    marginBottom: 8,
-    paddingHorizontal: 16,
     color: "#fff",
   },
   commentContainer: {
